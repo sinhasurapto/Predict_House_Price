@@ -4,6 +4,8 @@ import numpy as np
 import pickle
 import streamlit as st 
 from catboost import CatBoostRegressor    
+import gdown 
+import os
 
 # Columns
 columns = [
@@ -13,8 +15,12 @@ columns = [
 ]
 
 # Load the Random Forest model
-pickle_rf = open('random_forest_model.pkl', 'rb')
-model_rf = pickle.load(pickle_rf)
+url = "https://drive.google.com/uc?id=18xA5kOK4aQQO0UNwWqZ-Qub6Iu8XTtdH"
+file_id = "18xA5kOK4aQQO0UNwWqZ-Qub6Iu8XTtdH"
+output = 'random_forest_model.pkl'
+gdown.download(url, output, quiet=False)
+with open(output, 'rb') as file:
+    model_rf = pickle.load(file)
 
 # Load the Gradient Boosting model
 pickle_gb = open('gradient_boosting_model.pkl', 'rb')
