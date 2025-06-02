@@ -16,19 +16,19 @@ columns = ['State', 'City', 'Property_Type', 'BHK', 'Size_in_SqFt',
        'Security', 'Amenities', 'Facing', 'Owner_Type', 'Availability_Status']
 
 # Load the Random Forest model
-# url = "https://drive.google.com/uc?id=18xA5kOK4aQQO0UNwWqZ-Qub6Iu8XTtdH"
-# file_id = "18xA5kOK4aQQO0UNwWqZ-Qub6Iu8XTtdH"
-output = 'random_forest_model.pkl'
-# gdown.download(url, output, quiet=False)
+url = "https://drive.google.com/uc?id=1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
+file_id = "1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
+output = 'random_forest_model_new.pkl'
+gdown.download(url, output, quiet=False)
 with open(output, 'rb') as file:
     model_rf = pickle.load(file)
 
 # Load the Gradient Boosting model
-pickle_gb = open('gradient_boosting_model.pkl', 'rb')
+pickle_gb = open('gradient_boosting_model_new.pkl', 'rb')
 model_gb = pickle.load(pickle_gb)
 
 # Load the CatBoost model
-pickle_cb = open('cat_boost_model.pkl', 'rb')
+pickle_cb = open('cat_boost_model_new.pkl', 'rb')
 model_cb = pickle.load(pickle_cb)
 
 # Load the Dictionary Vectorizer 
