@@ -2,12 +2,14 @@
 import pandas as pd      
 import numpy as np       
 import pickle
+import gzip
 import streamlit as st 
 from catboost import CatBoostRegressor
 from sklearn.feature_extraction import DictVectorizer 
 from sklearn.preprocessing import OrdinalEncoder   
 import gdown 
 import os
+import requests
 
 # Columns
 columns = ['State', 'City', 'Property_Type', 'BHK', 'Size_in_SqFt',
@@ -20,12 +22,12 @@ columns = ['State', 'City', 'Property_Type', 'BHK', 'Size_in_SqFt',
 ordinal_columns = ['Property_Type', 'Furnished_Status', 'Public_Transport_Accessibility', 'Facing', 'Security']
 
 # Load the Random Forest model
-url = "https://drive.google.com/uc?id=1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
-file_id = "1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
-output = 'random_forest_model_new.pkl'
-gdown.download(url, output, quiet=False)
-with open(output, 'rb') as file:
-    model_rf = pickle.load(file)
+url = "https://github.com/sinhasurapto/Predict_House_Price/releases/download/v1.0/random_forest_model_new.pkl"
+r = requests.get(url)
+with open("random_forest_model_new.pkl", "wb") as f:
+    f.write(r.content)
+with open("random_forest_model_new.pkl", "rb") as f:
+    model_rf = pickle.load(f)
 
 # Load the Gradient Boosting model
 pickle_gb = open('gradient_boosting_model_new.pkl', 'rb')
