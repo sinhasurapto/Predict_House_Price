@@ -23,7 +23,7 @@ ordinal_columns = ['Property_Type', 'Furnished_Status', 'Public_Transport_Access
 url = "https://drive.google.com/uc?id=1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
 file_id = "1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
 output = 'random_forest_model_new.pkl'
-# gdown.download(url, output, quiet=False)
+gdown.download(url, output, quiet=False)
 with open(output, 'rb') as file:
     model_rf = pickle.load(file)
 
