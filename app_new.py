@@ -4,7 +4,8 @@ import numpy as np
 import pickle
 import streamlit as st 
 from catboost import CatBoostRegressor
-from sklearn.feature_extraction import DictVectorizer    
+from sklearn.feature_extraction import DictVectorizer 
+from sklearn.preprocessing import OrdinalEncoder   
 import gdown 
 import os
 
@@ -15,11 +16,14 @@ columns = ['State', 'City', 'Property_Type', 'BHK', 'Size_in_SqFt',
        'Nearby_Hospitals', 'Public_Transport_Accessibility', 'Parking_Space',
        'Security', 'Amenities', 'Facing', 'Owner_Type', 'Availability_Status']
 
+# Ordinal columns
+ordinal_columns = ['Property_Type', 'Furnished_Status', 'Public_Transport_Accessibility', 'Facing', 'Security']
+
 # Load the Random Forest model
 url = "https://drive.google.com/uc?id=1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
 file_id = "1lS1CzNT0v97gT97KomMtoi1CecUwdpU-"
 output = 'random_forest_model_new.pkl'
-gdown.download(url, output, quiet=False)
+# gdown.download(url, output, quiet=False)
 with open(output, 'rb') as file:
     model_rf = pickle.load(file)
 
@@ -32,8 +36,12 @@ pickle_cb = open('cat_boost_model_new.pkl', 'rb')
 model_cb = pickle.load(pickle_cb)
 
 # Load the Dictionary Vectorizer 
-pickle_cb = open('dict_vectorizer.pkl', 'rb')
-dv = pickle.load(pickle_cb)
+pickle_dv = open('dict_vectorizer.pkl', 'rb')
+dv = pickle.load(pickle_dv)
+
+# Load the Encoder
+pickle_ed = open('encoder.pkl', 'rb')
+encoder = pickle.load(pickle_ed)
 
 # Function to perform prediction
 def predict(data_frame):
@@ -60,24 +68,24 @@ def main():
     state = st.text_input("State: ") 
     city = st.text_input("City: ") 
     property_type = st.radio("Property type: ",
-                                  ["Apartment", "Villa", "Independent"]).lower()
-    bhk = st.text_input("BHK: ")
-    size_in_sqft = st.text_input("Size in sqft: ")
-    price_per_sqft = st.text_input("Price per sqft: ")
-    year_built = st.text_input("Year built: ") 
+                                  ["Apartment", "Villa", "Independent House"])
+    bhk = st.number_input("BHK: ", step=1, format="%d")
+    size_in_sqft = st.number_input("Size in sqft: ", format="%.5f")
+    price_per_sqft = st.number_input("Price per sqft: ", format="%.5f")
+    year_built = st.number_input("Year built: ", step=1, format="%d") 
     furnished_status = st.radio("Furnished status: ",
-                                ["Furnished", "Semi-furnished", "Unfurnished"]).lower()
-    floor_no = st.text_input("Floor number: ")
-    total_floors = st.text_input("Total number of floors: ")
-    age_of_property = st.text_input("Age of property: ")
-    nearby_schools = st.text_input("Number of nearby schools: ")
-    nearby_hospitals = st.text_input("Number of nearby hospitals: ")
+                                ["Furnished", "Semi-furnished", "Unfurnished"])
+    floor_no = st.number_input("Floor number: ", step=1, format="%d")
+    total_floors = st.number_input("Total number of floors: ", step=1, format="%d")
+    age_of_property = st.number_input("Age of property: ", step=1, format="%d")
+    nearby_schools = st.number_input("Number of nearby schools: ", step=1, format="%d")
+    nearby_hospitals = st.number_input("Number of nearby hospitals: ", step=1, format="%d")
     public_transport_accessibility = st.radio("Public transport accessibility: ",
-                                              ["Low", "Medium", "High"]).lower()
+                                              ["Low", "Medium", "High"])
     parking_space = st.radio("Parking space available?: ",
-                                  ["Yes", "No"]).lower()
+                                  ["Yes", "No"])
     security = st.radio("Security available?: ",
-                             ["Yes", "No"]).lower()
+                             ["Yes", "No"])
     selected_amenities = st.multiselect(
     "Select amenities: ",
     ["Clubhouse", "Gym", "Pool", "Garden", "Playground"]
@@ -85,7 +93,7 @@ def main():
     amenities_list = [amenity.lower() for amenity in selected_amenities]
     amenities_str = ", ".join(amenities_list)
     facing = st.radio("Facing: ",
-                      ["North", "South", "East", "West"]).lower()
+                      ["North", "South", "East", "West"])
     owner_type = st.radio("Owner type: ", ["Owner", "Builder", "Broker"]).lower()
     status = st.radio("Status: ", ["Under_Construction", "Ready_to_Move"]).lower()
 
@@ -114,13 +122,14 @@ def main():
         'Availability_Status': [status],  
     }
     df = pd.DataFrame(data_dict)
+    df[ordinal_columns] = encoder.transform(df[ordinal_columns])
     df_dict = df.to_dict(orient='records')
     df_dict = dv.transform(df_dict)
 
     # Predict button
     if st.button('Predict'):
         result = predict(df_dict)
-        st.success(f"House price is {result[0]}.")
+        st.success(f"House price is {result[0]} lakhs.")
 
 # Run the application
 if __name__ == '__main__': 
